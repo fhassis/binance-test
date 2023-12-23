@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "binance-python"
+version = "0.1.0"
+description = "A basic binance client written in Python."
+authors = ["fhassis <fhassis2@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+httpx = "^0.22.0"
+orjson = "^3.6.7"
+python-dotenv = "^0.20.0"
+websockets = "^10.3"
+
+[tool.poetry.dev-dependencies]
+black = "^22.1.0"
+pytest = "^7.1.1"
+pytest-asyncio = "^0.18.2"
+
+[tool.pytest.ini_options]
+asyncio_mode = "strict"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

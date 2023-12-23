@@ -1,0 +1,30 @@
+{
+  "name": "binance-ts",
+  "version": "0.0.1",
+  "description": "Binance client in TypeScript.",
+  "type": "module",
+  "main": "main.ts",
+  "scripts": {
+    "prod": "node --experimental-specifier-resolution=node --no-warnings ./dist/main.js",
+    "dev": "node --experimental-specifier-resolution=node --no-warnings --loader ts-node/esm ./src/main.ts",
+    "build": "tsc",
+    "start": "npm run dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fhassis/binance-ts.git"
+  },
+  "author": "Fabio Henrique de Assis",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^17.0.23",
+    "@types/ws": "^8.5.3",
+    "bufferutil": "^4.0.6",
+    "node-fetch": "^3.2.3",
+    "reconnecting-websocket": "^4.4.0",
+    "ts-node": "^10.7.0",
+    "typescript": "^4.6.3",
+    "utf-8-validate": "^5.0.9",
+    "ws": "^8.5.0"
+  }
+}

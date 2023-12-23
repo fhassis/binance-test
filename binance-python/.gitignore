@@ -1,0 +1,7 @@
+__pycache__
+.idea
+.venv
+.pytest_cache
+*.ipynb
+
+config.env
