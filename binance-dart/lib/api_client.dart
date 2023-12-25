@@ -1,30 +1,28 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:binance_dart/parsers.dart';
-import 'package:dio/dio.dart';
 import 'package:crypto/crypto.dart';
 
 import 'typings.dart';
 
 class BinanceClient {
-  late Dio _dio;
-  late Hmac _hmac;
+  late final Hmac _hmac;
+  late final String _apiKey;
+  late final String _baseUrl;
+  final _client = HttpClient();
 
   BinanceClient(
       {required String apiKey,
       required String apiSecret,
       bool testnet = false}) {
-    _dio = Dio(BaseOptions(
-      baseUrl: testnet
-          ? 'https://testnet.binance.vision'
-          : 'https://api.binance.com',
-      headers: {'X-MBX-APIKEY': apiKey},
-    ));
+    _baseUrl = testnet ? 'testnet.binance.vision' : 'api.binance.com';
     _hmac = Hmac(sha256, utf8.encode(apiSecret));
+    _apiKey = apiKey;
   }
 
   /// Closes the inner http client.
   void close() {
-    _dio.close();
+    _client.close();
   }
 
   /// Adds the signature parameter to a given map of parameters
@@ -36,13 +34,11 @@ class BinanceClient {
     params['timestamp'] =
         DateTime.now().toUtc().millisecondsSinceEpoch.toString();
 
-    // generate the query string based on the original query params
-    var list = [];
-    params.forEach((key, value) => list.add('$key=$value'));
-    var queryBytes = utf8.encode(list.join('&'));
+    // // generate the query string based on the original query params
+    final queryString = utf8.encode(Uri(queryParameters: params).query);
 
     // add signature to the query parameters
-    params['signature'] = _hmac.convert(queryBytes).toString();
+    params['signature'] = _hmac.convert(queryString).toString();
 
     return params;
   }
@@ -55,27 +51,28 @@ class BinanceClient {
       params = _addSignature(params);
     }
 
-    // performs http request
-    try {
-      var response = await _dio.request(
-        path,
-        options: Options(method: method),
-        queryParameters: params,
-      );
-      return response.data;
-    } on DioError catch (e) {
-      if (e.response?.data == "") {
-        throw Exception(e.error);
-      } else {
-        throw Exception(
-            'Error ${e.response?.data["code"]}: ${e.response?.data["msg"]}');
-      }
+    // creates the http request
+    final request =
+        await _client.openUrl(method, Uri.https(_baseUrl, path, params));
+    request.headers.set('X-MBX-APIKEY', _apiKey);
+
+    // sends the http request
+    final response = await request.close();
+
+    // handles the http response
+    if (response.statusCode == 200) {
+      final data = await response.transform(utf8.decoder).join();
+      return jsonDecode(data);
+    } else {
+      throw HttpException(
+          "HTTP status ${response.statusCode}: ${response.reasonPhrase}");
     }
   }
 
   /// Fetches the server time data.
-  Future<Json> fetchServerTime() async {
-    return await _sendRequest('GET', '/api/v3/time');
+  Future<int> fetchServerTime() async {
+    var json = await _sendRequest('GET', '/api/v3/time');
+    return parseServerTime(json);
   }
 
   /// Fetches the account info data.

@@ -15,9 +15,10 @@ class AccountMonitor {
     var listenKey = await _client.fetchListenKey();
 
     // creates the websocket handler
-    _wsHandler = WebsocketHandler('AccountMonitor', _handleWsData, useTestnet: true)
-      ..subscribeToUserData(listenKey)
-      ..start();
+    _wsHandler =
+        WebsocketHandler('AccountMonitor', _handleWsData, useTestnet: true)
+          ..subscribeToUserData(listenKey)
+          ..start();
 
     // var topics = ['btcusdt@kline_1m', 'btcusdt@miniTicker'];
     var topics = ['btcusdt@kline_1m', 'btcusdt@kline_1d'];
