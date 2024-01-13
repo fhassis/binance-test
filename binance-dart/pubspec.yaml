@@ -2,6 +2,7 @@ name: binance_dart
 description: A simple Dart client to the Binance API.
 version: 0.0.1
 homepage: https://github.com/fhassis/binance-dart
+publish_to: none
 
 environment:
   sdk: ^3.2.3
@@ -11,3 +12,4 @@ dependencies:
 
 dev_dependencies:
   lints: ^3.0.0
+  test: ^1.25.0
